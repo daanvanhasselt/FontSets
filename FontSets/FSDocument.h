@@ -8,20 +8,23 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FSDocument : NSDocument <NSOpenSavePanelDelegate>
+@interface FSDocument : NSDocument <NSTableViewDelegate>
 
 - (IBAction)exportHeader:(id)sender;
 - (IBAction)selectProjectDir:(id)sender;
 
-// handler for sheet ending
--(void)filePanelDidEnd:(NSWindow*)sheet
-            returnCode:(int)returnCode
-           contextInfo:(void*)contextInfo;
+- (IBAction)insertRow:(id)sender;
+- (IBAction)removeRow:(id)sender;
+
+- (IBAction)selectionDidChange:(id)sender;
 
 @property (strong) IBOutlet NSMutableArray *fonts;
+@property (strong) IBOutlet NSArrayController *arrayController;
+@property (strong) IBOutlet NSTableView *tableView;
 
 @property (strong) NSString *prefix;
 @property (strong) NSString *projectDir;
+
 
 
 @end

@@ -7,11 +7,14 @@
 //
 
 #import "FSDocument.h"
+#import "FSFont.h"
 
 @implementation FSDocument
 @synthesize fonts;
 @synthesize prefix;
 @synthesize projectDir;
+@synthesize arrayController;
+@synthesize tableView;
 
 - (id)init
 {
@@ -20,6 +23,12 @@
         // Add your subclass-specific initialization here.
         // If an error occurs here, return nil.
         self.fonts = [[NSMutableArray alloc] init];
+        
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        [nc addObserver:self
+               selector:@selector(textDidChange:)
+                   name:NSTextDidEndEditingNotification
+                 object:self.tableView];
     }
     return self;
 }
@@ -47,11 +56,30 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         while(self.projectDir == nil){}
         dispatch_sync(dispatch_get_main_queue(), ^{
-            NSString *path = [[NSBundle mainBundle] pathForResource:@"script" ofType:@"sh"];
-            NSString *bash = [NSString stringWithFormat: @"sh %@ %@ AAA BBB", path, self.projectDir];
-            system([bash cStringUsingEncoding:NSUTF8StringEncoding]);
+//            NSString *path = [[NSBundle mainBundle] pathForResource:@"script" ofType:@"sh"];
+//            NSString *bash = [NSString stringWithFormat: @"sh %@ %@ AAA BBB", path, self.projectDir];
+//            system([bash cStringUsingEncoding:NSUTF8StringEncoding]);
         });
     });
+}
+
+- (void)insertRow:(id)sender{
+    [self.arrayController insert:sender];
+//    NSLog(@"%@", [[self.arrayController arrangedObjects] objectAtIndex:[self.arrayController selectionIndex]]);
+}
+
+- (void)removeRow:(id)sender{
+    [self.arrayController remove:sender];
+}
+
+- (void)textDidChange:(NSNotification *)aNotification
+{
+    FSFont *font = [self.fonts objectAtIndex:[self.tableView selectedRow]];
+    [font generateName];
+}
+
+- (IBAction)selectionDidChange:(id)sender{
+    [self textDidChange:nil];
 }
 
 - (NSString *)windowNibName
